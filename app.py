@@ -19,6 +19,7 @@ def index():
 
         session['survey_key'] = request.form['survey']
         session['responses'] = []
+        session['comments'] = []
         return redirect('/questions/0')
 
 @app.route('/questions/<int:question_index>')
@@ -39,10 +40,13 @@ def questions(question_index):
 @app.route('/answer', methods=["POST"])
 def answer():
     "Take user question answer and put it in session data, send them to thanks page if complete, otherwise to next question"
-    
+
     responses = session['responses']
     responses.append(request.form["ans"])
     session["responses"] = responses
+    comments = session["comments"]
+    comments.append(request.form.get("comment"))
+    session["comments"] = comments
     this_survey = surveys[session['survey_key']]
     if len(responses) >= len(this_survey.questions):
         return render_template("thanks.html")

@@ -10,6 +10,10 @@
         {% for each in question.choices %}
             <input type="radio" id="{{each}}" name="ans" value="{{each}}"><label for="{{each}}">{{each}}</label>
         {% endfor %}
+        <br>
+        {% if question.allow_text == True %}
+            <label for="comment">Leave a comment:</label><input type="text" name="comment" id="comment">
+        {% endif %}
         <input type="submit">
     </form>
 {% endblock %}
