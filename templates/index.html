@@ -4,10 +4,15 @@
 {% block body %}
 
     <h1>SURVEYS:</h1>
-    <ul>
+    <form action="/" method="post">
+        <label for="survey">Choose a Survey:</label><br>
+        <select name="survey" id="survey">
         {% for each in surveys.items() %}
-            <li><a href="/{{each[0]}}/questions/0">{{each[1].title}}</a>  {{each[1].instructions}}</li>
+            <option value="{{each[0]}}"><b>{{each[1].title}}</b> {{each[1].instructions}}</option>
+            <!-- <li>{{each[1].title}}  {{each[1].instructions}}</li> -->
         {% endfor %}
-    </ul>
+        </select>
+        <input type="submit">
+    </form>
 
 {% endblock %}

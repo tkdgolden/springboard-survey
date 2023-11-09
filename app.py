@@ -1,34 +1,43 @@
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, flash, session
 # from flask_debugtoolbar import DebugToolbarExtension
 
-from surveys import Survey, Question, surveys
+from surveys import surveys
 
 app = Flask(__name__)
-# app.config['SECRET_KEY'] = "oh-so-secret"
+app.config['SECRET_KEY'] = "oh-so-secret"
 
 # debug = DebugToolbarExtension(app)
 
-responses = []
 
-@app.route('/')
+
+@app.route('/', methods=["GET", "POST"])
 def index():
-    return render_template("index.html", surveys=surveys)
+    if request.method == "GET":
+        return render_template("index.html", surveys=surveys)
+    if request.method == "POST":
+        session['survey_key'] = request.form['survey']
+        session['responses'] = []
+        return redirect('/questions/0')
 
-@app.route('/<survey_key>/questions/<int:question_index>')
-def questions(survey_key, question_index):
-    this_survey = surveys[survey_key]
-    print(len(responses), question_index)
+@app.route('/questions/<int:question_index>')
+def questions(question_index):
+    this_survey = surveys[session['survey_key']]
+    responses = session['responses']
     if len(responses) >= len(this_survey.questions):
+        flash("You have completed this survey.")
         return render_template("thanks.html")
     if (len(responses) != question_index):
-        return redirect(f"/{survey_key}/questions/{len(responses)}")
+        flash("Please answer the question")
+        return redirect(f"/questions/{len(responses)}")
     this_question = this_survey.questions[question_index]
-    return render_template("question.html", question=this_question, question_index=question_index, survey_key=survey_key)
+    return render_template("question.html", question=this_question, question_index=question_index)
 
-@app.route('/<survey_key>/answer', methods=["POST"])
-def answer(survey_key):
+@app.route('/answer', methods=["POST"])
+def answer():
+    responses = session['responses']
     responses.append(request.form["ans"])
-    this_survey = surveys[survey_key]
+    session["responses"] = responses
+    this_survey = surveys[session['survey_key']]
     if len(responses) >= len(this_survey.questions):
         return render_template("thanks.html")
-    return redirect(f'/{survey_key}/questions/{len(responses)}')
+    return redirect(f'/questions/{len(responses)}')
