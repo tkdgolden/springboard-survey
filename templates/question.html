@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Question{% endblock %}
+
+{% block body %}
+    <form action="/{{survey_key}}/answer" method="post">
+        <p>{{question.question}}</p>
+        {% for each in question.choices %}
+            <input type="radio" id="{{each}}" name="ans" value="{{each}}"><label for="{{each}}">{{each}}</label>
+        {% endfor %}
+        <input type="submit">
+    </form>
+{% endblock %}
